@@ -342,7 +342,29 @@ class BotCommands(commands.Cog):
         else:
             await interaction.followup.send(f"{config.EMOJI_INFO} FID `{fid}` was not found in the Fuel Managers list.", ephemeral=True)
 
-
+    @app_commands.command(name="settings", description="Configure and manage bot settings")
+    @app_commands.check(checks.is_admin)
+    async def settings_command(self, interaction: discord.Interaction):
+    """Configure and manage bot settings and preferences."""
+    
+    # Create the settings embed
+    embed = discord.Embed(
+        title=f"{config.EMOJI_MANAGE} Bot Settings",
+        description="Configure bot settings and active events.",
+        color=config.COLOR_MANAGE
+    )
+    
+    # Add fields for current settings
+    active_events = ", ".join(self.bot.active_events) if self.bot.active_events else "None"
+    embed.add_field(
+        name=f"{config.EMOJI_EVENT} Active Events", 
+        value=active_events, 
+        inline=False
+    )
+    
+    # Create a view with settings controls
+    view = ui_components.SettingsView(self.bot)
+    await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
     # =========================================================================
     # Command Handlers for UI Interactions (called from ui_components)
     # =========================================================================
