@@ -1,0 +1,6 @@
+discord.py
+aiohttp
+pandas
+openpyxl
+python-thefuzz[speedup]
+python-dotenv
