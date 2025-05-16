@@ -385,7 +385,42 @@ class RegistrationView(View):
             bot_log.warning("Failed to edit message on RegistrationView timeout (AttributeError).")
         self.stop()
 
-
+class SettingsView(discord.ui.View):
+    def __init__(self, bot):
+        super().__init__(timeout=300)  # 5-minute timeout
+        self.bot = bot
+        
+    @discord.ui.button(label="Toggle Foundry", emoji=config.EMOJI_EVENT, style=discord.ButtonStyle.primary)
+    async def toggle_foundry_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Toggle the Foundry event on/off"""
+        if "Foundry" in self.bot.active_events:
+            self.bot.active_events.remove("Foundry")
+            await interaction.response.send_message(f"{config.EMOJI_SUCCESS} Foundry event disabled", ephemeral=True)
+        else:
+            self.bot.active_events.append("Foundry")
+            await interaction.response.send_message(f"{config.EMOJI_SUCCESS} Foundry event enabled", ephemeral=True)
+        
+        # Update the registration embed if it exists
+        asyncio.create_task(state.update_registration_embed(self.bot))
+    
+    @discord.ui.button(label="Toggle Canyon", emoji=config.EMOJI_EVENT, style=discord.ButtonStyle.primary)
+    async def toggle_canyon_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Toggle the Canyon event on/off"""
+        if "Canyon" in self.bot.active_events:
+            self.bot.active_events.remove("Canyon")
+            await interaction.response.send_message(f"{config.EMOJI_SUCCESS} Canyon event disabled", ephemeral=True)
+        else:
+            self.bot.active_events.append("Canyon")
+            await interaction.response.send_message(f"{config.EMOJI_SUCCESS} Canyon event enabled", ephemeral=True)
+            
+        # Update the registration embed if it exists
+        asyncio.create_task(state.update_registration_embed(self.bot))
+            
+    @discord.ui.button(label="Close", style=discord.ButtonStyle.secondary, emoji=config.EMOJI_CANCEL)
+    async def close_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Close the settings menu"""
+        await interaction.response.edit_message(content="Settings menu closed.", embed=None, view=None)
+        
 class CancelRegistrationButton(View):
     def __init__(self, submitter_user_id, event, chief_name):
         super().__init__(timeout=300) # Standard timeout for ephemeral views
